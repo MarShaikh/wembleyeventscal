@@ -2,7 +2,6 @@
 
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
-import os
 from dotenv import load_dotenv
 import logging
 import json
@@ -17,6 +16,7 @@ CORS(app)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def load_events():
     try:
         with open('/home/marshaikh/mysite/wembleyCalendar/events_data.json', 'r') as f:
@@ -28,6 +28,7 @@ def load_events():
         logger.error("Error decoding events data file. Returning empty list.")
         return []
 
+
 @app.route('/api/events')
 def get_events():
     try:
@@ -37,10 +38,12 @@ def get_events():
         logger.error(f"Error in get_events: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+
 # Serve the main site at the root URL
 @app.route('/')
 def main_site():
     return send_from_directory('/home/marshaikh/mysite/static/main_site', 'index.html')
+
 
 # Serve the calendar site at /cal/
 @app.route('/cal/')

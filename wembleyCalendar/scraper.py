@@ -33,6 +33,7 @@ def fetch_url(url):
         logger.error(f"Error fetching URL {url}: {str(e)}")
         return None
 
+
 def scrape_events():
     url = os.getenv('SCRAPE_URL', "https://www.wembleystadium.com/events")
     html_content = fetch_url(url)
