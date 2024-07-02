@@ -1,5 +1,3 @@
-# scraper.py
-
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -9,6 +7,7 @@ import logging
 from ratelimit import limits, sleep_and_retry
 from cachetools import TTLCache, cached
 import json
+import time
 
 # Load environment variables
 load_dotenv()
@@ -20,19 +19,32 @@ logger = logging.getLogger(__name__)
 # Configure cache
 cache = TTLCache(maxsize=100, ttl=3600)  # Cache for 1 hour
 
+# Unset proxy settings if they exist
+os.environ.pop('http_proxy', None)
+os.environ.pop('https_proxy', None)
+
 # Rate limiting: 5 calls per minute
 @sleep_and_retry
 @limits(calls=5, period=60)
 @cached(cache)
 def fetch_url(url):
     try:
-        response = requests.get(url, timeout=10)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache'
+        }
+        response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
         return response.text
     except requests.RequestException as e:
         logger.error(f"Error fetching URL {url}: {str(e)}")
+        time.sleep(5)  # Wait for 5 seconds before retrying
         return None
-
 
 def scrape_events():
     url = os.getenv('SCRAPE_URL', "https://www.wembleystadium.com/events")
