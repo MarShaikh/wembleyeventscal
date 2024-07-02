@@ -72,7 +72,7 @@ def scrape_events():
         events.append({'name': event_name, 'date': iso_date})
 
     # Store the scraped data
-    with open('/home/marshaikh/mysite/wembleyCalendar/events_data.json', 'w') as f:
+    with open('./events_data.json', 'w') as f:
         json.dump(events, f)
 
     logger.info("Events scraped and stored successfully")
